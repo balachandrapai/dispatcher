@@ -36,10 +36,7 @@ func (d *Dispatcher) SetMaxAsyncTasks(poolSize int64) {
 // This function is used only when there is a maximum limit set on the number of go routines using SetMaxAsyncTasks.
 // The function acquires an async task with a weight of i, blocking until resources are available.
 func (d *Dispatcher) AcquireAsyncTask(i int) {
-	err := d.sem.Acquire(context.Background(), int64(i))
-	if err != nil {
-		panic(err)
-	}
+	_  = d.sem.Acquire(context.Background(), int64(i))
 }
 
 // ReleaseAsyncTask function is used to release the async task after execution.
@@ -142,12 +139,6 @@ func (d *Dispatcher) UnGuard() {
 // WaitForTasksCompletion stops the thread execution until all the queue tasks are processed
 func (d *Dispatcher) WaitForTasksCompletion() {
 	d.waitGroup.Wait()
-	go func() {
-		_, open := <- d.success
-		for open {
-			d.success <- true
-		}
-	}()
 	d.success <- true
 }
 
